@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build-and-test:
+  build:
     machine: true
     steps:
       - checkout
@@ -17,13 +17,14 @@ jobs:
       # Run the selenium test image
       - run: docker run --network="host" test-hello-circle:1.0.0
 
-  deploy:
-    machine: true
-    steps:
-      - checkout
+  # deploy:
+  #   machine: true
+  #   steps:
+  #     - checkout
 
-      # Rebuild flask app to be pushed
-      - run: docker build -f flask.Dockerfile -t tunzor/hello-circle:1.0.0 .
+  #     # Rebuild flask app to be pushed
+  #     - run: docker build -f flask.Dockerfile -t tunzor/hello-circle:1.0.0 .
 
-      # Push image to docker hub
-      - run: docker push tunzor/hello-circle:1.0.0 
+  #     # Push image to docker hub
+  #     - run: docker push tunzor/hello-circle:1.0.0 
+
