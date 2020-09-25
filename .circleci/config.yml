@@ -7,23 +7,23 @@ jobs:
      
       # Build the flask hello app
       - run: 
-        name: Build flask web app
-        command: docker build -f flask.Dockerfile -t hello-circle:1.0.0 .
+          name: Build flask web app
+          command: docker build -f flask.Dockerfile -t hello-circle:1.0.0 .
 
       # Build the selenium test image
       - run: 
-        name: Build selenium testing image
-        command: docker build -f seleniumtest.Dockerfile -t test-hello-circle:1.0.0 .
+          name: Build selenium testing image
+          command: docker build -f seleniumtest.Dockerfile -t test-hello-circle:1.0.0 .
 
       # Run the flask hello app
       - run: 
-        name: Start the flask web app container
-        command: docker run -d -p 5000:5000 hello-circle:1.0.0
+          name: Start the flask web app container
+          command: docker run -d -p 5000:5000 hello-circle:1.0.0
 
       # Run the selenium test image
       - run: 
-        name: Run the selenium container and test the flask web app
-        command: docker run --network="host" test-hello-circle:1.0.0
+          name: Run the selenium container and test the flask web app
+          command: docker run --network="host" test-hello-circle:1.0.0
 
   deploy:
     machine: true
