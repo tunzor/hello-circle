@@ -1,31 +1,27 @@
 version: 2
 jobs:
-  build:
+  build-and-test:
     machine: true
     steps:
       - checkout
      
-      # Build the flask hello app
       - run: 
           name: Build flask web app
           command: docker build -f flask.Dockerfile -t hello-circle:1.0.0 .
 
-      # Build the selenium test image
       - run: 
           name: Build selenium testing image
           command: docker build -f seleniumtest.Dockerfile -t test-hello-circle:1.0.0 .
 
-      # Run the flask hello app
       - run: 
           name: Start the flask web app container
           command: docker run -d -p 5000:5000 hello-circle:1.0.0
 
-      # Run the selenium test image
       - run: 
           name: Run the selenium container and test the flask web app
           command: docker run --network="host" test-hello-circle:1.0.0
 
-  deploy:
+  publish-image:
     machine: true
     steps:
       - run:
@@ -33,21 +29,39 @@ jobs:
           command: echo $GCP_TOKEN | base64 --decode | docker login -u _json_key --password-stdin https://gcr.io
       - checkout
 
-      # Rebuild flask app to be pushed
       - run:
           name: Build flask image and tag for GCR 
           command: docker build -f flask.Dockerfile -t gcr.io/hello-circle/hello-circle:1.0.0 .
 
-      # Push image to docker hub
       - run: 
           name: Push image to GCR
           command: docker push gcr.io/hello-circle/hello-circle:1.0.0 
+
+  deploy-to-gcp:
+    docker:
+      - image: google/cloud-sdk:alpine
+      steps:
+        run:
+          name: Authenticate SVC account
+          command: echo $GCP_TOKEN | base64 --decode | gcloud auth activate-service-account circleci-gcr-cloudrun@hello-circle.iam.gserviceaccount.com  --key-file=- --project=hello-circle
+        run:
+          name: Deploy image to Cloud Run
+          command: gcloud run deploy circleci-test --image gcr.io/hello-circle/hello-circle:1.0.0 --port 5000 --platform managed --region us-east4 --allow-unauthenticated
 
 workflows:
   version: 2
   build_test_and_deploy:
     jobs:
-      - build
-      - deploy:
-          requires:
-            - build
+      - deploy-to-gcp
+
+# workflows:
+#   version: 2
+#   build_test_and_deploy:
+#     jobs:
+#       - build-and-test
+#       - publish-image:
+#           requires:
+#             - build-and-test
+#       - deploy-to-gcp:
+#           requires:
+#             - deploy-image
