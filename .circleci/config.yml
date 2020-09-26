@@ -28,25 +28,26 @@ jobs:
   deploy:
     machine: true
     steps:
-      - run: 
-          name: Deploying
-          command: echo Deploying!
       - run:
           name: Login to gcr.io
           command: echo $GCP_TOKEN | base64 --decode | docker login -u _json_key --password-stdin https://gcr.io
       - checkout
 
       # Rebuild flask app to be pushed
-      - run: docker build -f flask.Dockerfile -t gcr.io/hello-circle/hello-circle:1.0.0 .
+      - run:
+          name: Build flask image and tag for GCR 
+          command: docker build -f flask.Dockerfile -t gcr.io/hello-circle/hello-circle:1.0.0 .
 
       # Push image to docker hub
-      - run: docker push gcr.io/hello-circle/hello-circle:1.0.0 
+      - run: 
+          name: Push image to GCR
+          command: docker push gcr.io/hello-circle/hello-circle:1.0.0 
 
 workflows:
   version: 2
   build_test_and_deploy:
     jobs:
-      # - build
+      - build
       - deploy
-          # requires:
-          #   - build
+          requires:
+            - build
