@@ -37,10 +37,10 @@ jobs:
       - checkout
 
       # Rebuild flask app to be pushed
-      - run: docker build -f flask.Dockerfile -t https://gcr.io/hello-circle/hello-circle:1.0.0 .
+      - run: docker build -f flask.Dockerfile -t gcr.io/hello-circle/hello-circle:1.0.0 .
 
       # Push image to docker hub
-      - run: docker push https://gcr.io/hello-circle/hello-circle:1.0.0 
+      - run: docker push gcr.io/hello-circle/hello-circle:1.0.0 
 
 workflows:
   version: 2
