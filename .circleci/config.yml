@@ -28,13 +28,19 @@ jobs:
   deploy:
     machine: true
     steps:
-      - run: echo Deploying!
-      # - checkout
-      # # Rebuild flask app to be pushed
-      # - run: docker build -f flask.Dockerfile -t tunzor/hello-circle:1.0.0 .
+      - run: 
+          name: Deploying
+          command: echo Deploying!
+      - run:
+          name: Login to gcr.io
+          command: echo $GCP_TOKEN | base64 -D -i - | docker login -u _json_key --password-stdin https://gcr.io
+      - checkout
 
-      # # Push image to docker hub
-      # - run: docker push tunzor/hello-circle:1.0.0 
+      # Rebuild flask app to be pushed
+      - run: docker build -f flask.Dockerfile -t https://gcr.io/hello-circle/hello-circle:1.0.0 .
+
+      # Push image to docker hub
+      - run: docker push https://gcr.io/hello-circle/hello-circle:1.0.0 
 
 workflows:
   version: 2
