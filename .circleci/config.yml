@@ -40,11 +40,11 @@ jobs:
   deploy-to-gcp:
     docker:
       - image: google/cloud-sdk:alpine
-      steps:
-        run:
+    steps:
+      - run:
           name: Authenticate SVC account
           command: echo $GCP_TOKEN | base64 --decode | gcloud auth activate-service-account circleci-gcr-cloudrun@hello-circle.iam.gserviceaccount.com  --key-file=- --project=hello-circle
-        run:
+      - run:
           name: Deploy image to Cloud Run
           command: gcloud run deploy circleci-test --image gcr.io/hello-circle/hello-circle:1.0.0 --port 5000 --platform managed --region us-east4 --allow-unauthenticated
 
