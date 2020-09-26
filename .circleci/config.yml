@@ -33,7 +33,7 @@ jobs:
           command: echo Deploying!
       - run:
           name: Login to gcr.io
-          command: echo $GCP_TOKEN | base64 -D -i - | docker login -u _json_key --password-stdin https://gcr.io
+          command: echo $GCP_TOKEN | base64 --decode | docker login -u _json_key --password-stdin https://gcr.io
       - checkout
 
       # Rebuild flask app to be pushed
