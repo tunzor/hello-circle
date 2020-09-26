@@ -52,7 +52,8 @@ workflows:
             - build-and-test
       - wait-for-approval:
           type: approval
-          requires: publish-image
+          requires: 
+            - publish-image
       - deploy-to-gcp:
           requires:
             - wait-for-approval
